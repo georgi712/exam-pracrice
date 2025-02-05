@@ -15,7 +15,11 @@ const authService = {
             throw new Error('User alredy exists!');
         }
 
-       return User.create(userData);
+
+       const createdUser = await User.create(userData);
+
+       const token = this.generateToken(createdUser);
+       return token;
     },
     async login(email, password) {
         const user = await User.findOne({ email });
@@ -28,6 +32,11 @@ const authService = {
             throw new Error('Invalid email or password!');
         };
 
+        const token = this.generateToken(user);
+
+        return token;
+    },
+    generateToken(user) {
         const payload = {
             id: user.id,
             email: user.email,
