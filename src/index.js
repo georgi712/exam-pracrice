@@ -4,6 +4,7 @@ import handlebars from 'express-handlebars';
 import path from 'path';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
+import { auth } from './middlewares/auth-middleware.js';
 
 const app = express();
 const port = 3000;
@@ -19,6 +20,9 @@ try {
 
 app.engine('hbs', handlebars.engine({
     extname: 'hbs',
+    runtimeOptions: {
+        allowProtoMethodsByDefault: true,
+    }
 }));
 
 app.set('view engine', 'hbs');
@@ -26,7 +30,8 @@ app.set('views', './src/views');
 
 app.use(express.static('src/public'));
 app.use(express.urlencoded({extended: false}));
-app.use(cookieParser())
+app.use(cookieParser());
+app.use(auth);
 app.use(router);
 
 app.listen(port, console.log('Server is running on http://localhost:3000...'));
