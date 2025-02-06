@@ -45,7 +45,7 @@ const deviceSchema = new Schema({
         type: String,
         required: true,
     },
-    image: {
+    imageUrl: {
         type: String,
         required: true,
     },
@@ -57,4 +57,8 @@ const deviceSchema = new Schema({
         type: Types.ObjectId,
         ref: 'User'
     }]
-})
+});
+
+const Device = model('Device', deviceSchema);
+
+export default Device;
