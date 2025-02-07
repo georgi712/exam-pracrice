@@ -11,8 +11,24 @@ devicesController.get('/catalog', async (req, res) => {
     } catch (err) {
         const error = getErrorMessage(err);
         res.render('404', { error });
-    }
+    } 
+});
+
+devicesController.get('/create', (req, res) => {
+    res.render('devices/create');
+});
+
+devicesController.post('/create', async (req, res) => {
+    const newDevice = req.body;
     
-})
+    try {
+        const userId = req.user?.id;
+        await deviceService.create(newDevice, userId);
+        res.redirect('/devices/catalog');
+    } catch (err) {
+        const error = getErrorMessage(err);
+        res.render('devices/create', { error, device: newDevice });
+    }
+});
 
 export default devicesController;
