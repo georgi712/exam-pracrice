@@ -49,9 +49,49 @@ devicesController.get('/:deviceId/details', async(req, res) => {
         res.render('devices/details', { device, user, isOwner, isPreferd })
     } catch (err) {
         const error = getErrorMessage(err);
-        res.render('404', {error})
+        res.render('404', {error});
     }
 
-})
+});
+
+devicesController.get('/:deviceId/edit', async (req, res) => {
+    const deviceId = req.params.deviceId;
+
+    try {
+        const device = await deviceService.getOne(deviceId);
+        res.render('devices/edit', {device})
+    } catch (err) {
+        const error = getErrorMessage(err);
+        res.render('404', {error});
+    }
+});
+
+devicesController.post('/:deviceId/edit', async (req, res) => {
+    const deviceData = req.body;
+    const deviceId = req.params.deviceId;
+
+    try {
+        await deviceService.update(deviceData, deviceId);
+
+        // TODO: Fields errors
+
+        res.redirect(`/devices/${deviceId}/details`);
+    } catch (err) {
+        const error = getErrorMessage(err);
+        res.render('devices/edit', { error, device: deviceData });
+    }
+});
+
+devicesController.get('/:deviceId/delete', async (req, res) => {
+    const deviceId = req.params.deviceId;
+
+    try {
+        const device = await deviceService.delete(deviceId);
+        res.redirect('/devices/catalog');
+    } catch (err) {
+        const error = getErrorMessage(err);
+        res.render('404', {error});
+    }
+});
 
 export default devicesController;

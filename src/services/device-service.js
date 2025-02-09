@@ -16,6 +16,12 @@ const deviceService = {
     },
     getOne(deviceId) {
         return Device.findById(deviceId)
+    },
+    update(deviceData, deviceId) {
+        return Device.findByIdAndUpdate(deviceId, deviceData);
+    },
+    delete(deviceId) {
+        return Device.findByIdAndDelete(deviceId);
     }
 };
 
