@@ -31,4 +31,27 @@ devicesController.post('/create', async (req, res) => {
     }
 });
 
+devicesController.get('/:deviceId/details', async(req, res) => {
+    const deviceId = req.params.deviceId;
+
+    try {
+        const device = await deviceService.getOne(deviceId);
+        const user = req.user;
+        const isOwner = device.owner?.toString() === req.user?.id;
+        const isPreferd = false;
+
+        device.peffereList.forEach((id) => {
+            if (id.toString() === req.user?.id) {
+                isPreferd = true;
+            }
+        });
+
+        res.render('devices/details', { device, user, isOwner, isPreferd })
+    } catch (err) {
+        const error = getErrorMessage(err);
+        res.render('404', {error})
+    }
+
+})
+
 export default devicesController;

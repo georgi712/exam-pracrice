@@ -13,6 +13,9 @@ const deviceService = {
             owner: ownerId
         });
         return result;
+    },
+    getOne(deviceId) {
+        return Device.findById(deviceId)
     }
 };
 
