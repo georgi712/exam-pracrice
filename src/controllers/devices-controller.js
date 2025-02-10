@@ -38,15 +38,15 @@ devicesController.get('/:deviceId/details', async(req, res) => {
         const device = await deviceService.getOne(deviceId);
         const user = req.user;
         const isOwner = device.owner?.toString() === req.user?.id;
-        const isPreferd = false;
+        let isPreferred = false;
 
-        device.peffereList.forEach((id) => {
+        device.preferredList.forEach((id) => {
             if (id.toString() === req.user?.id) {
-                isPreferd = true;
+                return isPreferred = true;
             }
         });
 
-        res.render('devices/details', { device, user, isOwner, isPreferd })
+        res.render('devices/details', { device, user, isOwner, isPreferred })
     } catch (err) {
         const error = getErrorMessage(err);
         res.render('404', {error});
@@ -88,6 +88,19 @@ devicesController.get('/:deviceId/delete', async (req, res) => {
     try {
         const device = await deviceService.delete(deviceId);
         res.redirect('/devices/catalog');
+    } catch (err) {
+        const error = getErrorMessage(err);
+        res.render('404', {error});
+    }
+});
+
+devicesController.get('/:deviceId/prefer', async (req, res) => {
+    const deviceId = req.params.deviceId;
+    const userId = req.user.id;
+
+    try {
+        await deviceService.addToPreferList(deviceId, userId);
+        res.redirect('/profile');
     } catch (err) {
         const error = getErrorMessage(err);
         res.render('404', {error});

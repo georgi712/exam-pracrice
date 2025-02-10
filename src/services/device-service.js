@@ -22,6 +22,13 @@ const deviceService = {
     },
     delete(deviceId) {
         return Device.findByIdAndDelete(deviceId);
+    },
+    addToPreferList(deviceId, userId) {
+        return Device.findByIdAndUpdate(deviceId, {
+            $push: {
+                preferredList: userId,
+            }
+        })
     }
 };
 
