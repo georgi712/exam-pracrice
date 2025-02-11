@@ -1,6 +1,7 @@
 import { Router } from "express";
 import deviceService from "../services/device-service.js";
 import { getErrorMessage } from "../utils/error-utils.js";
+import { isAuth } from "../middlewares/auth-middleware.js";
 
 const devicesController = Router();
 
@@ -14,11 +15,11 @@ devicesController.get('/catalog', async (req, res) => {
     } 
 });
 
-devicesController.get('/create', (req, res) => {
+devicesController.get('/create', isAuth, (req, res) => {
     res.render('devices/create');
 });
 
-devicesController.post('/create', async (req, res) => {
+devicesController.post('/create', isAuth, async (req, res) => {
     const newDevice = req.body;
     
     try {
@@ -54,8 +55,16 @@ devicesController.get('/:deviceId/details', async(req, res) => {
 
 });
 
-devicesController.get('/:deviceId/edit', async (req, res) => {
+devicesController.get('/:deviceId/edit', isAuth, async (req, res) => {
     const deviceId = req.params.deviceId;
+
+    const device = await deviceService.getOne(deviceId);
+    const user = req.user;
+    const isOwner = device.owner?.toString() === req.user?.id;
+
+    if (!isOwner) {
+        return res.redirect('/404');
+    }
 
     try {
         const device = await deviceService.getOne(deviceId);
@@ -66,11 +75,19 @@ devicesController.get('/:deviceId/edit', async (req, res) => {
     }
 });
 
-devicesController.post('/:deviceId/edit', async (req, res) => {
+devicesController.post('/:deviceId/edit', isAuth, async (req, res) => {
     const deviceData = req.body;
     const deviceId = req.params.deviceId;
 
     try {
+        const device = await deviceService.getOne(deviceId);
+        const user = req.user;
+        const isOwner = device.owner?.toString() === req.user?.id;
+    
+        if (!isOwner) {
+            return res.redirect('/404');
+        }
+
         await deviceService.update(deviceData, deviceId);
 
         // TODO: Fields errors
@@ -82,11 +99,19 @@ devicesController.post('/:deviceId/edit', async (req, res) => {
     }
 });
 
-devicesController.get('/:deviceId/delete', async (req, res) => {
+devicesController.get('/:deviceId/delete', isAuth, async (req, res) => {
     const deviceId = req.params.deviceId;
 
     try {
-        const device = await deviceService.delete(deviceId);
+        const device = await deviceService.getOne(deviceId);
+        const user = req.user;
+        const isOwner = device.owner?.toString() === req.user?.id;
+
+         if (!isOwner) {
+            return res.redirect('/404');
+        }
+
+        const deletedDevice = await deviceService.delete(deviceId);
         res.redirect('/devices/catalog');
     } catch (err) {
         const error = getErrorMessage(err);
@@ -94,11 +119,19 @@ devicesController.get('/:deviceId/delete', async (req, res) => {
     }
 });
 
-devicesController.get('/:deviceId/prefer', async (req, res) => {
+devicesController.get('/:deviceId/prefer', isAuth, async (req, res) => {
     const deviceId = req.params.deviceId;
     const userId = req.user.id;
 
     try {
+        const device = await deviceService.getOne(deviceId);
+        const user = req.user;
+        const isOwner = device.owner?.toString() === req.user?.id;
+
+        if (isOwner) {
+            return res.redirect('/404');
+        }
+
         await deviceService.addToPreferList(deviceId, userId);
         res.redirect('/profile');
     } catch (err) {
