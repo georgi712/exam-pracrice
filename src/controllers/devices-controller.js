@@ -104,7 +104,6 @@ devicesController.get('/:deviceId/delete', isAuth, async (req, res) => {
 
     try {
         const device = await deviceService.getOne(deviceId);
-        const user = req.user;
         const isOwner = device.owner?.toString() === req.user?.id;
 
          if (!isOwner) {
@@ -125,15 +124,14 @@ devicesController.get('/:deviceId/prefer', isAuth, async (req, res) => {
 
     try {
         const device = await deviceService.getOne(deviceId);
-        const user = req.user;
-        const isOwner = device.owner?.toString() === req.user?.id;
+        const isOwner = device.owner?.toString() === userId;
 
         if (isOwner) {
             return res.redirect('/404');
         }
 
         await deviceService.addToPreferList(deviceId, userId);
-        res.redirect('/profile');
+        res.redirect(`/devices/${deviceId}/details`);
     } catch (err) {
         const error = getErrorMessage(err);
         res.render('404', {error});
