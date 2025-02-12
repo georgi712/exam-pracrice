@@ -18,7 +18,7 @@ const deviceService = {
         return Device.findById(deviceId)
     },
     update(deviceData, deviceId) {
-        return Device.findByIdAndUpdate(deviceId, deviceData);
+        return Device.findByIdAndUpdate(deviceId, deviceData, { runValidators: true });
     },
     delete(deviceId) {
         return Device.findByIdAndDelete(deviceId);

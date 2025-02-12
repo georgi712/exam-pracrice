@@ -49,8 +49,8 @@ devicesController.get('/:deviceId/details', async(req, res) => {
 
         res.render('devices/details', { device, user, isOwner, isPreferred })
     } catch (err) {
-        const error = getErrorMessage(err);
-        res.render('404', {error});
+        res.setError(getErrorMessage(err));
+        res.redirect('/404');
     }
 
 });
@@ -85,6 +85,7 @@ devicesController.post('/:deviceId/edit', isAuth, async (req, res) => {
         const isOwner = device.owner?.toString() === req.user?.id;
     
         if (!isOwner) {
+            res.setError('Is not owner!')
             return res.redirect('/404');
         }
 
@@ -107,6 +108,7 @@ devicesController.get('/:deviceId/delete', isAuth, async (req, res) => {
         const isOwner = device.owner?.toString() === req.user?.id;
 
          if (!isOwner) {
+            res.setError('Is not owner!')
             return res.redirect('/404');
         }
 
@@ -125,17 +127,24 @@ devicesController.get('/:deviceId/prefer', isAuth, async (req, res) => {
     try {
         const device = await deviceService.getOne(deviceId);
         const isOwner = device.owner?.toString() === userId;
-
+        const isPreferred = device.preferredList.includes(req.user?.id);
+        
         if (isOwner) {
+            res.setError('Its owner!')
+            return res.redirect('/404');
+        }
+
+        if (isPreferred) {
+            res.setError('Its already prefered!')
             return res.redirect('/404');
         }
 
         await deviceService.addToPreferList(deviceId, userId);
-        res.redirect(`/devices/${deviceId}/details`);
     } catch (err) {
-        const error = getErrorMessage(err);
-        res.render('404', {error});
+        res.setError(getErrorMessage(err));
     }
+    
+    res.redirect(`/devices/${deviceId}/details`);
 });
 
 export default devicesController;

@@ -4,15 +4,19 @@ import bcrypt from 'bcrypt';
 const userSchema = new Schema({
     email: {
         type: String,
-        required: true, 
+        required: true,
+        minLength: 10
     },
     username: {
         type: String,
-        required: true,
+        required: true, 
+        minLength: 2,
+        maxLenght: 20
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        minLength: 4
     }
 });
 
