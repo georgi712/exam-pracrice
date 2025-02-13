@@ -29,6 +29,12 @@ const deviceService = {
                 preferredList: userId,
             }
         })
+    },
+    ownerDevices(ownerId) {
+        return Device.find({owner: ownerId});
+    },
+    prefferedDevices(userId) {
+        return Device.find({preferredList: userId})
     }
 };
 
